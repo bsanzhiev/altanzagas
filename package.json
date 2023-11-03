@@ -14,12 +14,16 @@
     "@mantine/ds": "^7.1.7",
     "@mantine/form": "^7.1.7",
     "@mantine/hooks": "7.1.7",
+    "@mantine/notifications": "^7.1.7",
     "@tabler/icons-react": "^2.40.0",
+    "axios": "^1.6.0",
     "firebase": "^10.5.2",
     "jotai": "^2.5.0",
+    "libphonenumber": "^0.0.10",
     "next": "13.4.4",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "reactfire": "^4.2.3"
   },
   "devDependencies": {
     "@types/node": "20.2.5",

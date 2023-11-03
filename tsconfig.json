@@ -28,8 +28,9 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    // "global.d.ts",
     ".next/types/**/*.ts"
-  ],
+, "firebase.ts"  ],
   "exclude": [
     "node_modules"
   ]
