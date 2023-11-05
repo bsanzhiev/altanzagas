@@ -1,5 +1,4 @@
 import axios, { AxiosError } from "axios";
-import { NextApiResponse } from "next";
 
 const BASE_URL = "http://127.0.0.0:8099";
 
