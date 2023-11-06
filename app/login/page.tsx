@@ -139,10 +139,12 @@ function Login(props: PaperProps) {
 			});
 	}
 
+	// Login logic ==========================================
+
 	const loginData = {
 		email: form.values.email,
 		password: form.values.password,
-	}
+	};
 
 	const registerData = {
 		first_name: form.values.first_name,
@@ -150,15 +152,24 @@ function Login(props: PaperProps) {
 		username: form.values.username,
 		email: form.values.email,
 		password: form.values.password,
-	}
+	};
 
 	async function loginHandle() {
-		authRoutes.login(loginData)
+		try {
+			const response = authRoutes.login(loginData);
+			if ((await response).token) {
+				router.push("/");
+			}
+		} catch (error) {
+			console.log("Error while login", error);
+		}
 	}
 
 	async function registerHandle() {
-		authRoutes.register(registerData)
+		authRoutes.register(registerData);
 	}
+
+	// ======================================================
 
 	return (
 		<>
@@ -180,10 +191,13 @@ function Login(props: PaperProps) {
 						<Button radius="xl" onClick={() => setMethod("email")}>
 							Email
 						</Button>
-						<Button radius="xl" onClick={() => {
-							setMethod("phone");
-							toggle("login");
-						}}>
+						<Button
+							radius="xl"
+							onClick={() => {
+								setMethod("phone");
+								toggle("login");
+							}}
+						>
 							Phone Number
 						</Button>
 					</Group>
@@ -330,7 +344,7 @@ function Login(props: PaperProps) {
 									disabled={isSubmitDisabled}
 									type="submit"
 									radius="xl"
-									onClick={ type === "register" ? registerHandle : loginHandle}
+									onClick={type === "register" ? registerHandle : loginHandle}
 								>
 									{upperFirst(type)}
 								</Button>
