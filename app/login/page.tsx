@@ -143,8 +143,21 @@ function Login(props: PaperProps) {
 		email: form.values.email,
 		password: form.values.password,
 	}
+
+	const registerData = {
+		first_name: form.values.first_name,
+		second_name: form.values.second_name,
+		username: form.values.username,
+		email: form.values.email,
+		password: form.values.password,
+	}
+
 	async function loginHandle() {
 		authRoutes.login(loginData)
+	}
+
+	async function registerHandle() {
+		authRoutes.register(registerData)
 	}
 
 	return (
@@ -167,7 +180,10 @@ function Login(props: PaperProps) {
 						<Button radius="xl" onClick={() => setMethod("email")}>
 							Email
 						</Button>
-						<Button radius="xl" onClick={() => setMethod("phone")}>
+						<Button radius="xl" onClick={() => {
+							setMethod("phone");
+							toggle("login");
+						}}>
 							Phone Number
 						</Button>
 					</Group>
@@ -299,7 +315,10 @@ function Login(props: PaperProps) {
 								component="button"
 								type="button"
 								c="dimmed"
-								onClick={() => toggle()}
+								onClick={() => {
+									toggle();
+									setMethod("email");
+								}}
 								size="xs"
 							>
 								{type === "register"
@@ -311,7 +330,7 @@ function Login(props: PaperProps) {
 									disabled={isSubmitDisabled}
 									type="submit"
 									radius="xl"
-									onClick={loginHandle}
+									onClick={ type === "register" ? registerHandle : loginHandle}
 								>
 									{upperFirst(type)}
 								</Button>

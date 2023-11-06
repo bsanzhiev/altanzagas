@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 const BASE_URL = "http://127.0.0.0:8099";
 
@@ -7,26 +7,41 @@ interface LoginData {
 	password: string;
 }
 
+interface RegisterData extends LoginData {
+	first_name: string;
+	second_name: string;
+	username: string;
+}
+
+interface RegisterResponse {
+	userID: number;
+	email: string;
+	username: string;
+	error: string | undefined;
+}
+
 interface LoginResponse {
-  error: string | undefined;
 	userID: number;
 	email: string;
 	username: string;
 	token: string;
+	error: string | undefined;
 }
 
 const authRoutes = {
-	register: async (data: any) => {
+	register: async (registerdData: RegisterData) => {
 		try {
-			const response = await axios.post(`${BASE_URL}/auth/register`, data);
-			return response.data as ApiResponse;
+			const response = await axios.post(
+				`${BASE_URL}/auth/register`,
+				registerdData
+			);
+			return response.data as RegisterResponse;
 		} catch (error: any) {
 			const axiosError = error as AxiosError;
 			if (axiosError.response) {
-				// Если есть ответ от сервера, вывести сообщение об ошибке
-				throw new Error(axiosError.response.data.error);
+				const axiosError = error as AxiosResponse<RegisterResponse>;
+				throw new Error(axiosError.data.error);
 			} else {
-				// В противном случае, обработать другие виды ошибок
 				throw axiosError;
 			}
 		}
@@ -41,11 +56,9 @@ const authRoutes = {
 		} catch (error) {
 			const axiosError = error as AxiosError;
 			if (axiosError.response) {
-				// Если есть ответ от сервера, вывести сообщение об ошибке
 				const responseData = axiosError.response.data as LoginResponse;
 				throw new Error(responseData.error);
 			} else {
-				// В противном случае, обработать другие виды ошибок
 				throw axiosError;
 			}
 		}
