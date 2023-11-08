@@ -33,6 +33,8 @@ import {
 	ConfirmationResult,
 	RecaptchaVerifier,
 	signInWithPhoneNumber,
+	GoogleAuthProvider,
+	signInWithPopup,
 } from "firebase/auth";
 import authRoutes from "../../services/index";
 
@@ -143,6 +145,35 @@ function Login(props: PaperProps) {
 			});
 	}
 
+	function signInWithGoogle() {
+		const provider = new GoogleAuthProvider();
+		signInWithPopup(auth, provider)
+			.then((result) => {
+				// This gives you a Google Access Token. 
+				// You can use it to access the Google API.
+				const credential = GoogleAuthProvider.credentialFromResult(result);
+				const token = credential ? credential.accessToken : null;
+				// The signed-in user info.
+				const user = result.user;
+				// IdP data available using getAdditionalUserInfo(result)
+				// ...
+				console.log("user", user);
+				console.log("token", token);
+				showSuccessfulNotification("Success login with Google: "+user.displayName);
+				router.push("/");
+			})
+			.catch((error) => {
+				// Handle Errors here.
+				const errorCode = error.code;
+				const errorMessage = error.message;
+				// The email of the user's account used.
+				const email = error.customData.email;
+				// The AuthCredential type that was used.
+				const credential = GoogleAuthProvider.credentialFromError(error);
+				showFailedNotification("Login with Google was failed: "+errorMessage);
+			});
+	}
+
 	// Login logic ==========================================
 
 	const loginData = {
@@ -157,7 +188,6 @@ function Login(props: PaperProps) {
 		email: form.values.email,
 		password: form.values.password,
 	};
-
 
 	async function loginHandle() {
 		try {
@@ -180,12 +210,12 @@ function Login(props: PaperProps) {
 		try {
 			const verifyData = {
 				idToken: idToken,
-				phone: phone
-			}
+				phone: phone,
+			};
 			const response = authRoutes.verifyToken(verifyData);
 			if ((await response).token) {
 				// TODO get auth and save token to local storage
-				localStorage.setItem('authToken', (await response).token);
+				localStorage.setItem("authToken", (await response).token);
 				showSuccessfulNotification("Phone number verified");
 				router.push("/");
 			}
@@ -207,7 +237,7 @@ function Login(props: PaperProps) {
 						Welcome to Altanzagas, {type} with
 					</Text>
 					<Group grow mb="md" mt="md">
-						<GoogleButton radius="xl">Google</GoogleButton>
+						<GoogleButton radius="xl" signInWithGoogle={signInWithGoogle}>Google</GoogleButton>
 						<TwitterButton radius="xl">Twitter</TwitterButton>
 					</Group>
 
