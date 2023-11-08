@@ -74,17 +74,17 @@ function Login(props: PaperProps) {
 	const isSubmitDisabled = method === "phone" && form.values.code === "";
 
 	// Notifications ========================================================
-	function showSuccessfulNotification() {
+	function showSuccessfulNotification(message: string) {
 		notifications.show({
-			message: "Verification successful",
+			message: message,
 			color: "teal",
 			icon: <IconCheck />,
 		});
 	}
 
-	function showFailedNotification() {
+	function showFailedNotification(message: string) {
 		notifications.show({
-			message: "Invalid code",
+			message: message,
 			color: "red",
 			icon: <IconX />,
 		});
@@ -92,6 +92,8 @@ function Login(props: PaperProps) {
 
 	// Firebase logic ======================================================
 	const phoneNumber = form.values.phone;
+	let idToken = "";
+	let phone = "";
 
 	function onCaptchaVerify() {
 		// @ts-ignore
@@ -129,12 +131,14 @@ function Login(props: PaperProps) {
 		window.confirmationResult
 			.confirm(otp)
 			.then(async (res: any) => {
-				showSuccessfulNotification();
-				console.log("CRED", res);
-				router.push("/");
+				showSuccessfulNotification("OTP verified");
+				idToken = res._tokenResponse.idToken;
+				phone = res._tokenResponse.phoneNumber;
+				await verifyHandle(idToken);
+				console.log("CREDENTIAL", res);
 			})
 			.catch((err: any) => {
-				showFailedNotification();
+				showFailedNotification("Invalid code");
 				console.log("Verification error", err);
 			});
 	}
@@ -154,19 +158,41 @@ function Login(props: PaperProps) {
 		password: form.values.password,
 	};
 
+
 	async function loginHandle() {
 		try {
 			const response = authRoutes.login(loginData);
 			if ((await response).token) {
+				showSuccessfulNotification("Login successfull");
 				router.push("/");
 			}
 		} catch (error) {
+			showFailedNotification("Error while login");
 			console.log("Error while login", error);
 		}
 	}
 
 	async function registerHandle() {
 		authRoutes.register(registerData);
+	}
+
+	async function verifyHandle(idToken: string) {
+		try {
+			const verifyData = {
+				idToken: idToken,
+				phone: phone
+			}
+			const response = authRoutes.verifyToken(verifyData);
+			if ((await response).token) {
+				// TODO get auth and save token to local storage
+				localStorage.setItem('authToken', (await response).token);
+				showSuccessfulNotification("Phone number verified");
+				router.push("/");
+			}
+		} catch (error) {
+			showFailedNotification("Error while verifying ID token");
+			console.log("Error while verifying number", error);
+		}
 	}
 
 	// ======================================================
