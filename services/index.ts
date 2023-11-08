@@ -13,6 +13,10 @@ interface RegisterData extends LoginData {
 	username: string;
 }
 
+interface VerifyData {
+	idToken: string
+}
+
 interface RegisterResponse {
 	userID: number;
 	email: string;
@@ -52,6 +56,27 @@ const authRoutes = {
 			const response = await axios.post(`${BASE_URL}/auth/login`, credentials, {
 				responseType: "json",
 			});
+			return response.data as LoginResponse;
+		} catch (error) {
+			const axiosError = error as AxiosError;
+			if (axiosError.response) {
+				const responseData = axiosError.response.data as LoginResponse;
+				throw new Error(responseData.error);
+			} else {
+				throw axiosError;
+			}
+		}
+	},
+
+	verifyToken: async (token: VerifyData) => {
+		try {
+			const response = await axios.post(
+				`${BASE_URL}/auth/verify-token`,
+				token,
+				{
+					responseType: "json",
+				}
+			);
 			return response.data as LoginResponse;
 		} catch (error) {
 			const axiosError = error as AxiosError;
